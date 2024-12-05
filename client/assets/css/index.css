@@ -1,0 +1,53 @@
+.navbar-expand-lg {
+    background-color: #1E3798;
+}
+
+.text-white {
+    margin-left: 10px;
+}
+
+.btn {
+    background-color: #25C32B; 
+    color: #fff; 
+    border-radius: 0; 
+    margin-right: 10px; 
+    padding: 5px 20px; 
+    font-size: 14px;
+}
+
+.adm:hover {
+    color: #fff;
+    background-color:#25a829;
+}
+
+.adm a {
+    text-decoration: none;
+    color: #fff;
+}
+
+main .align-items-center {
+    margin-top: 40px;
+}
+
+main h2 {
+    font-size: 22px;
+}
+
+main .btn-primary {
+    background-color: #5A85F1;  
+    width: 120px; 
+    height: 35px;
+    margin-top: 0px;
+}
+
+table {
+    margin-top: 35px;
+}
+
+table #acao {
+    color: #1E3798;
+}
+
+footer {
+    margin-top: 200px;
+}

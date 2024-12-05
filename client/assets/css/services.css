@@ -1,0 +1,119 @@
+.navbar-expand-lg {
+    background-color: #1E3798;
+}
+
+.text-white {
+    margin-left: 10px;
+}
+
+.btn {
+    background-color: #25C32B; 
+    color: #fff; 
+    border-radius: 0; 
+    margin-right: 10px; 
+    padding: 5px 20px; 
+    font-size: 14px;
+}
+
+.adm:hover {
+    color: #fff;
+    background-color:#25a829;
+}
+
+main .align-items-center {
+    margin-top: 40px;
+}
+
+main h2 {
+    font-size: 22px;
+}
+
+main .btn-primary {
+    background-color: #5A85F1;  
+    width: 120px; 
+    height: 35px;
+    margin-top: 0px;
+}
+
+section a {
+    text-decoration: none;
+}
+
+section i {
+    font-size: 24px;
+}
+
+section a, h2 {
+    color: #0B860F;
+}
+
+section h2 {
+    font-size: 28px;
+    text-transform: uppercase;
+}
+
+#add-services {
+    margin-top: 40px;
+}
+
+section h3 {
+    color: #0B860F;
+    font-size: 22px;
+}
+
+.custom-width {
+    max-width: 400px; 
+}
+
+form .form-label {
+    color: #0B860F;
+}
+
+.form-control-lg {
+    height: 40px; 
+    font-size: 16px;
+}
+
+.form-control-lg:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #aaa8a8a1;
+}
+
+form .btn-success {
+    background-color: #0B860F;
+    padding: 10px 15px;
+    border-radius: 0;
+    text-transform: uppercase; 
+    font-size: 14px; 
+    border: none;
+}
+
+form .btn-success:hover {
+    background-color: #25a829;
+    border: none;
+}
+
+#table-services h3 {
+    color: #25a829;
+    font-weight: bold;
+}
+
+#table-services table {
+    max-width: 700px;
+    text-align: center;
+}
+
+#table-services table .icons {
+    font-size: 10px;
+}
+
+table button {
+    border: none;
+    background-color: transparent;
+    font-size: 12px;
+}
+
+table i {
+    font-size: 18px;
+}

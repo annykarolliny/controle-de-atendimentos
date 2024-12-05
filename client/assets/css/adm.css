@@ -1,0 +1,91 @@
+.navbar-expand-lg {
+    background-color: #1E3798;
+}
+
+.text-white {
+    margin-left: 10px;
+}
+
+section a {
+    text-decoration: none;
+}
+
+section i {
+    font-size: 24px;
+}
+
+section a, h2 {
+    color: #0B860F;
+}
+
+section h2 {
+    font-size: 28px;
+    text-transform: uppercase;
+}
+
+#add-adms {
+    margin-top: 40px;
+}
+
+section h3 {
+    color: #0B860F;
+    font-size: 22px;
+}
+
+.custom-width {
+    max-width: 400px; 
+}
+
+form .form-label {
+    color: #0B860F;
+}
+
+.form-control-lg {
+    height: 40px; 
+    font-size: 16px;
+}
+
+.form-control-lg:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #aaa8a8a1;
+}
+
+form .btn-success {
+    background-color: #0B860F;
+    padding: 10px 15px;
+    border-radius: 0;
+    text-transform: uppercase; 
+    font-size: 14px;
+    margin-left: 5px; 
+    border: none;
+}
+
+form .btn-success:hover {
+    background-color: #25a829;
+    border: none;
+}
+
+#adms h3 {
+    color: #25a829;
+    font-weight: bold;
+}
+
+#adms table {
+    max-width: 700px;
+}
+
+#adms table .icons {
+    text-align: center;
+    font-size: 10px;
+}
+
+table button {
+    border: none;
+    background-color: transparent;
+    font-size: 12px;
+}
+
+table i {
+    font-size: 18px;
+}
