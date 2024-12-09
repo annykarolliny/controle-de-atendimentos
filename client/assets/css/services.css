@@ -20,6 +20,11 @@
     background-color:#25a829;
 }
 
+.adm a {
+    text-decoration: none;
+    color: #fff;
+}
+
 main .align-items-center {
     margin-top: 40px;
 }
