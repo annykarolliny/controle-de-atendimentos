@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="../assets/favicon/icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/index.css">
+    <script src="../assets/js/index.js" defer></script>
   </head>
   <body>
 
@@ -29,7 +30,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h2>Listagem de atendimentos e solicitações</h2>
 
-                <button class="btn btn-primary d-flex align-items-center justify-content-center">
+                <button class="btn btn-primary d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#addRecordModal">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -92,6 +93,65 @@
                 </tbody>
             </table>
         </section>
+
+        <div class="modal fade" id="addRecordModal" tabindex="-1" aria-labelledby="addRecordModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addRecordModalLabel">Adicionar registro</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form">
+                            <h6 class="mb-3">Dados pessoais</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Nome" name="nome">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Sobrenome" name="sobrenome">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <input type="tel" class="form-control form-control-sm" placeholder="Telefone" name="telefone">
+                            </div>
+                            <h6 class="mb-3">Dados do atendimento</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <select class="form-select form-select-sm" name="atendente">
+                                        <option selected>Atendente</option>
+                                        <option>Atendente 1</option>
+                                        <option>Atendente 2</option>
+                                        <option>Atendente 3</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control form-control-sm" name="data-atendimento">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select class="form-select form-select-sm" name="servico">
+                                        <option selected>Tipo de serviço</option>
+                                        <option>Serviço 1</option>
+                                        <option>Serviço 2</option>
+                                        <option>Serviço 3</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <a href="services.html">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-sm" id="submitData">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer>

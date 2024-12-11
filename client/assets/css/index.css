@@ -48,6 +48,40 @@ table #acao {
     color: #1E3798;
 }
 
+.form-control:focus, .form-select:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #aaa8a8a1;
+}
+
+.col-md-2 {
+    margin-top: 4px;
+    margin-left: 10px;
+    width: 40px;
+    padding: 0px;
+}
+
+.col-md-2 a {
+    background-color: #5A85F1;
+    border-radius: 5px;
+    padding: 5px 20px;
+    transition: all 0.3s;
+}
+
+.col-md-2 i {
+    color: #fff;
+}
+
+.col-md-2 a:hover {
+    background-color: #2d61e6;
+}
+
+.modal-footer button {
+    background-color: #1E3798;
+    border: none;
+    border-radius: 5px;
+}
+
 footer {
     margin-top: 200px;
 }
