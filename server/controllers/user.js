@@ -6,10 +6,10 @@ export const getAtendimentos = async (_, res) => {
     const q = "SELECT * FROM atendimentos";
     
     try {
-        const data = await db.query(q); // Espera o resultado da query
-        return res.status(200).json(data); // Envia os dados como resposta
+        const data = await db.query(q); 
+        return res.status(200).json(data); 
     } catch (err) {
-        return res.status(500).json(err); // Envia o erro como resposta
+        return res.status(500).json(err); 
     }
 };
 
@@ -22,9 +22,9 @@ export const createAtendimento = async (req, res) => {
     const params = [nome, sobrenome, telefone, servico, data, atendente];
 
     try {
-        const data = await db.query(q, params); // Insere os dados no banco
-        return res.status(201).json(data[0]); // Retorna o registro adicionado
+        const data = await db.query(q, params);
+        return res.status(201).json(data[0]); 
     } catch (err) {
-        return res.status(500).json(err); // Envia o erro como resposta
+        return res.status(500).json(err); 
     }
 };
