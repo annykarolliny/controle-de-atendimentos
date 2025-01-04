@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="../assets/favicon/icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/adm.css">
+    <script src="../assets/js/adm.js" defer></script>
 </head>
 <body>
     
@@ -38,7 +39,7 @@
             <div class="container mt-5">
                 <h3 class="mb-4">Adicionar novo administrador</h3>
                 
-                <form>
+                <form id="form">
                     <div class="row">
                         <div class="col-md-5 mb-3 custom-width">
                             <label for="nome" class="form-label">Informe o nome</label>
@@ -51,7 +52,7 @@
                         </div>
         
                         <div class="col-md-2 mb-3 d-flex align-items-end">
-                            <button type="submit" class="btn btn-success btn-lg">add</button>
+                            <button type="submit" class="btn btn-success btn-lg" id="submitData">add</button>
                         </div>
                     </div>
                 </form>
@@ -71,7 +72,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                             <td>Maria Silva</td>
                             <td>123.456.789-00</td>
                             <td class="icons">
@@ -94,7 +95,7 @@
                                 <button href="#" class="text-primary"><i class="fas fa-edit"></i></button>
                                 <button href="#" class="text-danger ms-2"><i class="fas fa-trash"></i></button>
                             </td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
