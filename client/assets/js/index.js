@@ -117,6 +117,54 @@ const removerAtendimento = async (e) => {
     }
 };
 
+const carregarAtendentes = async () => {
+    const selectAtendente = document.querySelector("#select-atendente");
+
+    try {
+        const response = await fetch("http://localhost:8800/adms");
+        
+        if (!response.ok) {
+            throw new Error("Erro ao carregar atendentes");
+        }
+
+        const atendentes = await response.json();
+
+        atendentes.forEach(atendente => {
+            const option = document.createElement('option');
+            option.value = atendente.id;
+            option.textContent = atendente.nome;
+            selectAtendente.appendChild(option);
+        });
+    } catch (error) {
+        console.error(error);
+        alert("Não foi possível carregar os atendentes.");
+    }
+}
+
+const carregarServicos = async () => {
+    const selectServicos = document.querySelector("#select-servicos");
+
+    try {
+        const response = await fetch("http://localhost:8800/services");
+        
+        if (!response.ok) {
+            throw new Error("Erro ao carregar serviços");
+        }
+
+        const servicos = await response.json();
+
+        servicos.forEach(servico => {
+            const option = document.createElement('option');
+            option.value = servico.id;
+            option.textContent = servico.servico;
+            selectServicos.appendChild(option);
+        });
+    } catch (error) {
+        console.error(error);
+        alert("Não foi possível carregar os serviços.");
+    }
+}
+
 const editarAtendimento = async (e) => {
     e.preventDefault();
 
@@ -197,3 +245,5 @@ document.querySelector('tbody').addEventListener('click', editarAtendimento);
 
 // Inicializa os dados
 fetchAtendimentos();
+carregarAtendentes();
+carregarServicos();
