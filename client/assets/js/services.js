@@ -75,7 +75,15 @@ const removerService = async (e) => {
 document.querySelector('#submitData').addEventListener('click', function (e) {
     e.preventDefault();
 
-    const servico = document.querySelector('#servico').value;
+    const servicoInput = document.querySelector('#servico');
+    const servico = servicoInput.value.trim(); // Remove espaços extras
+
+    // Validação: nome do serviço obrigatório
+    if (!servico) {
+        alert("O nome do serviço é obrigatório.");
+        servicoInput.focus(); // Foca no campo de entrada
+        return;
+    }
 
     const dados = { servico };
 
@@ -84,14 +92,45 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            // Verifica se a resposta contém erro de serviço duplicado
+            return response.json().then(error => {
+                alert(error.message); // Exibe a mensagem de erro
+                throw new Error(error.message);
+            });
+        }
+        return response.json();
+    })
     .then(result => {
         alert('Serviço adicionado com sucesso!');
-        document.querySelector('#form').reset();
-        addNovoService(result);
+        document.querySelector('#form').reset(); // Limpa o formulário
+        addNovoService(result); // Adiciona o novo serviço na tabela
     })
     .catch(error => console.error('Erro:', error));
 });
+
+
+// document.querySelector('#submitData').addEventListener('click', function (e) {
+//     e.preventDefault();
+
+//     const servico = document.querySelector('#servico').value;
+
+//     const dados = { servico };
+
+//     fetch('http://localhost:8800/services/', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(dados),
+//     })
+//     .then(response => response.json())
+//     .then(result => {
+//         alert('Serviço adicionado com sucesso!');
+//         document.querySelector('#form').reset();
+//         addNovoService(result);
+//     })
+//     .catch(error => console.error('Erro:', error));
+// });
 
 document.querySelector('tbody').addEventListener('click', removerService);
 

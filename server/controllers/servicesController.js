@@ -15,6 +15,12 @@ export const getServices = async (req, res) => {
 
 export const insertService = async (req, res) => {
     const { servico } = req.body;
+
+    // Validação: o campo "servico" é obrigatório
+    if (!servico || servico.trim() === "") {
+        return res.status(400).json({ message: "O nome do serviço é obrigatório." });
+    }
+
     const q = `
         INSERT INTO servicos (servico)
         VALUES ($1) RETURNING *;
@@ -23,11 +29,34 @@ export const insertService = async (req, res) => {
 
     try {
         const data = await db.query(q, params);
-        return res.status(201).json(data[0]); 
+        return res.status(201).json(data[0]); // Retorna o serviço criado
     } catch (err) {
-        return res.status(500).json(err); 
+        if (err.code === '23505') { // Código de erro para chave única no Postgres
+            return res.status(400).json({ message: "O serviço já está cadastrado." });
+        }
+        return res.status(500).json({ message: "Erro no servidor.", error: err.message });
     }
 };
+
+
+// export const insertService = async (req, res) => {
+//     const { servico } = req.body;
+//     const q = `
+//         INSERT INTO servicos (servico)
+//         VALUES ($1) RETURNING *;
+//     `;
+//     const params = [servico];
+
+//     try {
+//         const data = await db.query(q, params);
+//         return res.status(201).json(data[0]); 
+//     } catch (err) {
+//         if (err.code === '23505') { // Código de erro para chave única no Postgres
+//             return res.status(400).json({ message: "O serviço já está cadastrado." });
+//         }
+//         return res.status(500).json(err); 
+//     }
+// };
 
 export const deleteService = async (req, res) => {
     const { id } = req.params;
