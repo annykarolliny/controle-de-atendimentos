@@ -7,16 +7,21 @@ const fetchAdms = () => {
         .catch(error => console.error('Erro ao buscar atendimentos:', error));
 };
 
+const formatarCpf = (cpf) => {
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+
 const exibirAdms = (adms) => {
     const tableBody = document.querySelector('tbody');
     tableBody.innerHTML = ''; 
 
     adms.forEach(adm => {
         const novaLinha = document.createElement('tr');
+        const cpfFormatado = formatarCpf(adm.cpf);
 
         novaLinha.innerHTML = `
             <td>${adm.nome}</td>
-            <td>${adm.cpf}</td>
+            <td>${cpfFormatado}</td>
             <td class="icons">
                 <a href="#" class="text-primary"><i class="fas fa-edit"></i></a>
                 <a href="#" class="text-danger ms-3"><i class="fas fa-trash"></i></a>
@@ -29,10 +34,11 @@ const exibirAdms = (adms) => {
 const addNovoAdm = (adm) => {
     const tableBody = document.querySelector('tbody');
     const novaLinha = document.createElement('tr');
+    const cpfFormatado = formatarCpf(adm.cpf);
 
     novaLinha.innerHTML = `
         <td>${adm.nome}</td>
-        <td>${adm.cpf}</td>
+        <td>${cpfFormatado}</td>
         <td class="icons">
             <a href="#" class="text-primary"><i class="fas fa-edit"></i></a>
             <a href="#" class="text-danger ms-3"><i class="fas fa-trash"></i></a>
