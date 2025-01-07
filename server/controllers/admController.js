@@ -13,8 +13,41 @@ export const getAdms = async (req, res) => {
     }
 };
 
+// export const insertAdm = async (req, res) => {
+//     const { nome, cpf } = req.body;
+//     const q = `
+//         INSERT INTO adm (nome, cpf)
+//         VALUES ($1, $2) RETURNING *;
+//     `;
+//     const params = [nome, cpf];
+
+//     try {
+//         const { rows } = await db.query(q, params);
+//         return res.status(201).json(rows[0]); // Retorna o registro criado
+//     } catch (err) {
+//         // Verifica se o erro é de violação da restrição UNIQUE
+//         if (err.code === '23505') {
+//             return res.status(400).json({ 
+//                 message: "CPF já está cadastrado.",
+//                 field: "cpf"
+//             });
+//         }
+//         // Lida com outros erros
+//         return res.status(500).json({ 
+//             message: "Erro no servidor.",
+//             error: err.message
+//         });
+//     }
+// };
+
+
 export const insertAdm = async (req, res) => {
     const { nome, cpf } = req.body;
+
+    if (!cpf) {
+        return res.status(400).json({ message: "CPF é obrigatório." });
+    }
+
     const q = `
         INSERT INTO adm (nome, cpf)
         VALUES ($1, $2) RETURNING *;
@@ -25,6 +58,10 @@ export const insertAdm = async (req, res) => {
         const data = await db.query(q, params);
         return res.status(201).json(data[0]); 
     } catch (err) {
+        if (err.code === '23505') {
+            return res.status(400).json({ message: "O CPF já está cadastrado." });
+        }
+        
         return res.status(500).json(err); 
     }
 };

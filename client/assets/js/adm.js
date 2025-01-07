@@ -8,6 +8,11 @@ const fetchAdms = () => {
 };
 
 const formatarCpf = (cpf) => {
+    if (!cpf || typeof cpf !== "string") {
+        console.error("CPF inválido");
+        return "";
+    }
+
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 }
 
@@ -17,6 +22,12 @@ const exibirAdms = (adms) => {
 
     adms.forEach(adm => {
         const novaLinha = document.createElement('tr');
+
+        if (adm.cpf === "") {
+            console.error("CPF inválido");
+            return;
+        }
+
         const cpfFormatado = formatarCpf(adm.cpf);
 
         novaLinha.innerHTML = `
@@ -52,7 +63,8 @@ const removerAdm = async (e) => {
     
     if (e.target.classList.contains('fa-trash')) {
         const linha = e.target.closest('tr');
-        const cpf = linha.children[1].textContent;
+        const cpfFormatado = linha.children[1].textContent;
+        const cpf = cpfFormatado.replace(/\D/g, "");
 
         if (confirm('Tem certeza que deseja excluir este registro?')) {
             try {
@@ -82,6 +94,11 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
     const nome = document.querySelector('#nome').value;
     const cpf = document.querySelector('#cpf').value;
 
+    if (!formatarCpf(cpf)) {
+        alert("CPF inválido.");
+        return;
+    }
+
     const dados = { nome, cpf };
 
     fetch('http://localhost:8800/adms/', {
@@ -89,7 +106,16 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            // Verifica se a resposta contém erro de CPF duplicado
+            return response.json().then(error => {
+                alert(error.message); 
+                throw new Error(error.message);
+            });
+        }
+        return response.json();
+    })
     .then(result => {
         alert('Administrador adicionado com sucesso!');
         document.querySelector('#form').reset();
