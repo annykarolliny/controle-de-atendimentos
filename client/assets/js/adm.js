@@ -1,5 +1,5 @@
 const fetchAdms = () => {
-    fetch('http://localhost:8800/adms/')
+    fetch('http://localhost:8800/adms')
         .then(response => response.json())
         .then(data => {
             displayAdms(data);
@@ -33,7 +33,6 @@ const displayAdms = (adms) => {
         newLine.innerHTML = `
             <td>${adm.nome}</td>
             <td>${formattedCpf}</td>
-            <td>${adm.senha}</td>
             <td class="icons">
                 <a href="#" class="text-primary"><i class="fas fa-edit"></i></a>
                 <a href="#" class="text-danger ms-3"><i class="fas fa-trash"></i></a>
@@ -51,7 +50,6 @@ const addNovoAdm = (adm) => {
     newLine.innerHTML = `
         <td>${adm.nome}</td>
         <td>${formattedCpf}</td>
-        <td>${adm.senha}</td>
         <td class="icons">
             <a href="#" class="text-primary"><i class="fas fa-edit"></i></a>
             <a href="#" class="text-danger ms-3"><i class="fas fa-trash"></i></a>
