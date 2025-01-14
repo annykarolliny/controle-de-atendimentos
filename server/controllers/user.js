@@ -1,9 +1,9 @@
-import Database from "../db.js";
+import Database from '../db.js';
 
 const db = new Database();
 
 export const getAtendimentos = async (req, res) => {
-    const q = "SELECT * FROM atendimentos";
+    const q = 'SELECT * FROM atendimentos';
     
     try {
         const data = await db.query(q); 
@@ -13,38 +13,54 @@ export const getAtendimentos = async (req, res) => {
     }
 };
 
-export const createAtendimento = async (req, res) => {
+export const insertAtendimento = async (req, res) => {
     const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
-    const q = `
-        INSERT INTO atendimentos (nome, sobrenome, telefone, servico, data, atendente)
-        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
+
+    const queryCheck = `
+        SELECT * FROM atendimentos 
+        WHERE nome = $1 AND sobrenome = $2 AND telefone = $3 AND servico = $4 AND data = $5 AND atendente = $6;
     `;
-    const params = [nome, sobrenome, telefone, servico, data, atendente];
+    const paramsCheck = [nome, sobrenome, telefone, servico, data, atendente];
 
     try {
-        const data = await db.query(q, params);
-        return res.status(201).json(data[0]); 
+        const existingAtendimento = await db.query(queryCheck, paramsCheck);
+
+        // Se já existe, retorna erro
+        if (existingAtendimento.length > 0) {
+            return res.status(400).json({
+                error: 'Atendimento já existe para essa data!',
+            });
+        }
+
+        const q = `
+            INSERT INTO atendimentos (nome, sobrenome, telefone, servico, data, atendente)
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
+        `;
+        const params = [nome, sobrenome, telefone, servico, data, atendente];
+        const dado = await db.query(q, params);
+
+        return res.status(201).json(dado[0]);
     } catch (err) {
-        return res.status(500).json(err); 
+        return res.status(500).json({ error: err.message });
     }
 };
 
 export const deleteAtendimento = async (req, res) => {
     const { id } = req.params;
 
-    const q = "DELETE FROM atendimentos WHERE id = $1";
+    const q = 'DELETE FROM atendimentos WHERE id = $1';
 
     try {
         const result = await db.query(q, [id]);
 
         if (result.rowCount === 0) {
-            return res.status(404).send("Registro não encontrado");
+            return res.status(404).send('Atendimento não encontrado');
         }
 
-        res.status(200).send("Registro excluído com sucesso");
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Erro ao excluir registro");
+        res.status(200).send('Atendimento excluído com sucesso');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao excluir atendimento');
     }
 };
 
@@ -54,8 +70,7 @@ export const updateAtendimento = async (req, res) => {
 
     const q = `
         UPDATE atendimentos 
-        SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6
-        WHERE id = $7 RETURNING *;
+        SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6 RETURNING *;
     `;
     const values = [nome, sobrenome, telefone, servico, data, atendente, id];
 
@@ -63,14 +78,14 @@ export const updateAtendimento = async (req, res) => {
         const result = await db.query(q, values);
 
         if (result.rowCount === 0) {
-            return res.status(404).send("Registro não encontrado");
+            return res.status(404).send('Registro não encontrado');
         }
 
         // Retorna o atendimento atualizado para o frontend
         res.status(200).json(result.rows[0]);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Erro ao atualizar registro");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao atualizar registro');
     }
 };
 
@@ -90,12 +105,12 @@ export const updateAtendimento = async (req, res) => {
 //         const result = await db.query(q, values);
 
 //         if (result.rowCount === 0) {
-//             return res.status(404).send("Registro não encontrado");
+//             return res.status(404).send('Registro não encontrado');
 //         }
 
-//         res.status(200).send("Registro atualizado com sucesso");
+//         res.status(200).send('Registro atualizado com sucesso');
 //     } catch (error) {
 //         console.error(error);
-//         res.status(500).send("Erro ao atualizar registro");
+//         res.status(500).send('Erro ao atualizar registro');
 //     }
 // };

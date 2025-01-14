@@ -1,21 +1,21 @@
 const fetchServices = () => {
     fetch('http://localhost:8800/services/')
         .then(response => response.json())
-        .then(dados => {
-            exibirServicos(dados);
+        .then(data => {
+            displayServices(data);
         })
-        .catch(error => console.error('Erro ao buscar atendimentos:', error));
+        .catch(error => console.error('Erro ao buscar serviços:', error));
 };
 
-const exibirServicos = (services) => {
+const displayServices = (services) => {
     const tableBody = document.querySelector('tbody');
     tableBody.innerHTML = ''; 
 
     services.forEach(service => {
-        const novaLinha = document.createElement('tr');
-        novaLinha.setAttribute("data-id", service.id);
+        const newLine = document.createElement('tr');
+        newLine.setAttribute('data-id', service.id);
 
-        novaLinha.innerHTML = `
+        newLine.innerHTML = `
             <td>${service.id}</td>
             <td>${service.servico}</td>
             <td class="icons">
@@ -23,16 +23,16 @@ const exibirServicos = (services) => {
                 <a href="#" class="text-danger ms-3"><i class="fas fa-trash"></i></a>
             </td>
         `;
-        tableBody.appendChild(novaLinha);
+        tableBody.appendChild(newLine);
     });
 };
 
-const addNovoService = (service) => {
+const addNewService = (service) => {
     const tableBody = document.querySelector('tbody');
-    const novaLinha = document.createElement('tr');
-    novaLinha.setAttribute("data-id", service.id);
+    const newLine = document.createElement('tr');
+    newLine.setAttribute('data-id', service.id);
 
-    novaLinha.innerHTML = `
+    newLine.innerHTML = `
         <td>${service.id}</td>
         <td>${service.servico}</td>
         <td class="icons">
@@ -40,25 +40,25 @@ const addNovoService = (service) => {
             <a href="#" class="text-danger ms-3"><i class="fas fa-trash"></i></a>
         </td>
     `;
-    tableBody.appendChild(novaLinha);
+    tableBody.appendChild(newLine);
 };
 
-const removerService = async (e) => {
+const removeService = async (e) => {
     e.preventDefault();
     
     if (e.target.classList.contains('fa-trash')) {
-        const linha = e.target.closest('tr');
-        const id = linha.dataset.id;
+        const line = e.target.closest('tr');
+        const id = line.dataset.id;
 
         if (confirm('Tem certeza que deseja excluir este serviço?')) {
             try {
-                const response = await fetch(`http://localhost:8800/services/api/records/${id}`, {
+                const response = await fetch(`http://localhost:8800/services/${id}`, {
                     method: 'DELETE',
                 });
 
                 if (response.ok) {
                     alert('Serviço excluído com sucesso!');
-                    linha.remove();
+                    line.remove();
                 } else if (response.status === 404) {
                     alert('Serviço não encontrado.');
                 } else {
@@ -75,13 +75,12 @@ const removerService = async (e) => {
 document.querySelector('#submitData').addEventListener('click', function (e) {
     e.preventDefault();
 
-    const servicoInput = document.querySelector('#servico');
-    const servico = servicoInput.value.trim(); // Remove espaços extras
+    const serviceInput = document.querySelector('#servico');
+    const servico = serviceInput.value.trim(); 
 
-    // Validação: nome do serviço obrigatório
     if (!servico) {
-        alert("O nome do serviço é obrigatório.");
-        servicoInput.focus(); // Foca no campo de entrada
+        alert('O nome do serviço é obrigatório.');
+        serviceInput.focus(); // Foca no campo de entrada
         return;
     }
 
@@ -96,7 +95,7 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
         if (!response.ok) {
             // Verifica se a resposta contém erro de serviço duplicado
             return response.json().then(error => {
-                alert(error.message); // Exibe a mensagem de erro
+                alert(error.message); 
                 throw new Error(error.message);
             });
         }
@@ -104,34 +103,12 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
     })
     .then(result => {
         alert('Serviço adicionado com sucesso!');
-        document.querySelector('#form').reset(); // Limpa o formulário
-        addNovoService(result); // Adiciona o novo serviço na tabela
+        document.querySelector('#form').reset(); 
+        addNewService(result); 
     })
     .catch(error => console.error('Erro:', error));
 });
 
-
-// document.querySelector('#submitData').addEventListener('click', function (e) {
-//     e.preventDefault();
-
-//     const servico = document.querySelector('#servico').value;
-
-//     const dados = { servico };
-
-//     fetch('http://localhost:8800/services/', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(dados),
-//     })
-//     .then(response => response.json())
-//     .then(result => {
-//         alert('Serviço adicionado com sucesso!');
-//         document.querySelector('#form').reset();
-//         addNovoService(result);
-//     })
-//     .catch(error => console.error('Erro:', error));
-// });
-
-document.querySelector('tbody').addEventListener('click', removerService);
+document.querySelector('tbody').addEventListener('click', removeService);
 
 fetchServices();
