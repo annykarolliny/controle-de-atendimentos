@@ -1,3 +1,38 @@
+document.querySelector('#submitData').addEventListener('click', function () {
+    const nome = document.querySelector('[name="nome"]').value;
+    const sobrenome = document.querySelector('[name="sobrenome"]').value;
+    const telefone = document.querySelector('[name="telefone"]').value;
+    const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
+    const data = document.querySelector('[name="data-atendimento"]').value;
+    const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
+
+    const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
+
+    fetch('http://localhost:8800/atendimentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
+    })
+        .then(response => {
+            // Verifica se a resposta foi bem-sucedida
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.error); });
+            }
+            return response.json(); // Retorna os dados para o próximo `then`
+        })
+        .then(result => {
+            // Se a resposta foi bem-sucedida, adiciona o novo atendimento
+            alert('Registro adicionado com sucesso!');
+            document.querySelector('#form').reset();
+            addNewAtendimento(result); // Chama somente com dados válidos
+        })
+        .catch(error => {
+            // Trata o erro sem adicionar lines "undefined"
+            alert(`Erro: ${error.message}`);
+            console.error('Erro:', error);
+        });
+});
+
 const fetchAtendimentos = () => {
     fetch('http://localhost:8800/atendimentos')
         .then(response => response.json())
@@ -6,21 +41,6 @@ const fetchAtendimentos = () => {
         })
         .catch(error => console.error('Erro ao buscar atendimentos:', error));
 };
-
-// const fetchAtendimentos = () => {
-//     fetch('http://localhost:8800/atendimentos')
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error(`Erro na resposta do servidor: ${response.status}`);
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             const atendimentos = data.rows || []; // Acesse a propriedade `rows` e use um array vazio como fallback
-//             displayAtendimentos(atendimentos);
-//         })
-//         .catch(error => console.error('Erro ao buscar atendimentos:', error));
-// };
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -67,55 +87,6 @@ const displayAtendimentos = (atendimentos) => {
         tableBody.appendChild(newLine);
     });
 };
-
-document.querySelector('#submitData').addEventListener('click', function () {
-    const nome = document.querySelector('[name="nome"]').value;
-    const sobrenome = document.querySelector('[name="sobrenome"]').value;
-    const telefone = document.querySelector('[name="telefone"]').value;
-    const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
-    const data = document.querySelector('[name="data-atendimento"]').value;
-    const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
-
-    const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
-
-    fetch('http://localhost:8800/atendimentos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados),
-    })
-        .then(response => {
-            // Verifica se a resposta foi bem-sucedida
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.error); });
-            }
-            return response.json(); // Retorna os dados para o próximo `then`
-        })
-        .then(result => {
-            // Se a resposta foi bem-sucedida, adiciona o novo atendimento
-            alert('Registro adicionado com sucesso!');
-            document.querySelector('#form').reset();
-            addNewAtendimento(result); // Chama somente com dados válidos
-        })
-        .catch(error => {
-            // Trata o erro sem adicionar lines "undefined"
-            alert(`Erro: ${error.message}`);
-            console.error('Erro:', error);
-        });
-    
-
-    // fetch('http://localhost:8800/', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(dados),
-    // })
-    // .then(response => response.json())
-    // .then(result => {
-    //     alert('Registro adicionado com sucesso!');
-    //     document.querySelector('#form').reset();
-    //     addNewAtendimento(result);
-    // })
-    // .catch(error => console.error('Erro:', error));
-});
 
 const atendimentoAlreadyExisting = (atendimento) => {
     const lines = document.querySelectorAll('tbody tr');
@@ -191,88 +162,6 @@ const removerAtendimento = async (e) => {
     }
 };
 
-// const removerAtendimento = async (e) => {
-//     e.preventDefault();
-
-//     if (e.target.classList.contains('fa-trash')) {
-//         const line = e.target.closest('tr');
-//         const id = line.dataset.id;
-
-//         if (confirm('Tem certeza que deseja excluir este registro?')) {
-//             try {
-//                 // Primeiro, exclui o atendimento
-//                 const response = await fetch(`http://localhost:8800/atendimentos/${id}`, {
-//                     method: 'DELETE',
-//                 });
-
-//                 if (response.ok) {
-//                     const data = await response.json(); // Obtém a resposta com o telefone
-
-//                     alert('Atendimento excluído com sucesso!');
-//                     line.remove();
-
-//                     // Verifica se o telefone foi retornado para excluir o agricultor
-//                     const telefone = data.telefone;
-//                     if (telefone) {
-//                         const agricultorResponse = await fetch(`http://localhost:8800/agricultores/${telefone}`, {
-//                             method: 'DELETE',
-//                         });
-
-//                         if (agricultorResponse.ok) {
-//                             alert('Agricultor associado excluído com sucesso!');
-//                         } else if (agricultorResponse.status === 404) {
-//                             alert('Agricultor não encontrado.');
-//                         } else {
-//                             alert('Erro ao excluir o agricultor associado.');
-//                         }
-//                     } else {
-//                         alert('Telefone do agricultor não foi retornado.');
-//                     }
-//                 } else if (response.status === 404) {
-//                     alert('Atendimento não encontrado.');
-//                 } else {
-//                     alert('Erro ao excluir o atendimento.');
-//                 }
-//             } catch (error) {
-//                 console.error('Erro ao excluir atendimento:', error);
-//                 alert('Erro na conexão com o servidor.');
-//             }
-//         }
-//     }
-// };
-
-// const loadAtendentes = async () => {
-//     const selectAtendente = document.querySelector('#select-atendente');
-
-//     try {
-//         const response = await fetch('http://localhost:8800/adms');
-        
-//         if (!response.ok) {
-//             throw new Error('Erro ao carregar atendentes');
-//         }
-
-//         const data = await response.json();
-
-//         // Verifique se os atendentes estão dentro de `data.rows`
-//         const atendentes = data.rows || data; // Use `data.rows` se disponível, caso contrário, use `data` diretamente
-
-//         if (!Array.isArray(atendentes)) {
-//             throw new Error('Formato de dados inesperado: atendentes não é um array.');
-//         }
-
-//         atendentes.forEach(atendente => {
-//             const option = document.createElement('option');
-//             option.value = atendente.cpf;
-//             option.textContent = atendente.nome;
-//             selectAtendente.appendChild(option);
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         alert('Não foi possível carregar os atendentes.');
-//     }
-// };
-
-
 const loadAtendentes = async () => {
     const selectAtendente = document.querySelector('#select-atendente');
 
@@ -297,38 +186,6 @@ const loadAtendentes = async () => {
         alert('Não foi possível carregar os atendentes.');
     }
 }
-
-// const loadServices = async () => {
-//     const selectServices = document.querySelector('#select-servicos');
-
-//     try {
-//         const response = await fetch('http://localhost:8800/services');
-        
-//         if (!response.ok) {
-//             throw new Error('Erro ao carregar serviços');
-//         }
-
-//         const data = await response.json();
-
-//         // Verifique se os serviços estão dentro de `data.rows`
-//         const services = data.rows || data; // Use `data.rows` se disponível, senão use `data` diretamente
-
-//         if (!Array.isArray(services)) {
-//             throw new Error('Formato de dados inesperado: serviços não é um array.');
-//         }
-
-//         services.forEach(service => {
-//             const option = document.createElement('option');
-//             option.value = service.id; // Identificador único para o serviço
-//             option.textContent = service.servico; // Nome do serviço a ser exibido
-//             selectServices.appendChild(option);
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         alert('Não foi possível carregar os serviços.');
-//     }
-// };
-
 
 const loadServices = async () => {
     const selectServices = document.querySelector('#select-servicos');

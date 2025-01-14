@@ -1,3 +1,40 @@
+document.querySelector('#submitData').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const serviceInput = document.querySelector('#servico');
+    const servico = serviceInput.value.trim(); 
+
+    if (!servico) {
+        alert('O nome do serviço é obrigatório.');
+        serviceInput.focus(); // Foca no campo de entrada
+        return;
+    }
+
+    const dados = { servico };
+
+    fetch('http://localhost:8800/services/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Verifica se a resposta contém erro de serviço duplicado
+            return response.json().then(error => {
+                alert(error.message); 
+                throw new Error(error.message);
+            });
+        }
+        return response.json();
+    })
+    .then(result => {
+        alert('Serviço adicionado com sucesso!');
+        document.querySelector('#form').reset(); 
+        addNewService(result); 
+    })
+    .catch(error => console.error('Erro:', error));
+});
+
 const fetchServices = () => {
     fetch('http://localhost:8800/services/')
         .then(response => response.json())
@@ -72,43 +109,54 @@ const removeService = async (e) => {
     }
 };
 
-document.querySelector('#submitData').addEventListener('click', function (e) {
+const editService = (e) => {
     e.preventDefault();
 
-    const serviceInput = document.querySelector('#servico');
-    const servico = serviceInput.value.trim(); 
+    if (e.target.classList.contains('fa-edit')) {
+        const line = e.target.closest('tr');
+        const id = line.dataset.id;
+        const currentService = line.children[1].textContent;
 
-    if (!servico) {
-        alert('O nome do serviço é obrigatório.');
-        serviceInput.focus(); // Foca no campo de entrada
-        return;
+        // Preenche o campo do modal com o serviço atual
+        document.querySelector('#editServiceInput').value = currentService;
+        
+        // Exibe o modal
+        const editModal = new bootstrap.Modal(document.querySelector('#editServiceModal'));
+        editModal.show();
+
+        // Quando o botão "Salvar" for clicado, envia a edição ao backend
+        document.querySelector('#editServiceBtn').onclick = async function () {
+            const updatedService = document.querySelector('#editServiceInput').value.trim();
+
+            if (!updatedService) {
+                alert('O nome do serviço não pode estar vazio!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8800/services/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ servico: updatedService }),
+                });
+
+                if (response.ok) {
+                    alert('Serviço atualizado com sucesso!');
+                    line.children[1].textContent = updatedService; 
+
+                    editModal.hide();
+                } else {
+                    alert('Erro ao atualizar o serviço.');
+                }
+            } catch (error) {
+                console.error('Erro ao editar o serviço:', error);
+                alert('Erro na conexão com o servidor.');
+            }
+        };
     }
+};
 
-    const dados = { servico };
-
-    fetch('http://localhost:8800/services/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados),
-    })
-    .then(response => {
-        if (!response.ok) {
-            // Verifica se a resposta contém erro de serviço duplicado
-            return response.json().then(error => {
-                alert(error.message); 
-                throw new Error(error.message);
-            });
-        }
-        return response.json();
-    })
-    .then(result => {
-        alert('Serviço adicionado com sucesso!');
-        document.querySelector('#form').reset(); 
-        addNewService(result); 
-    })
-    .catch(error => console.error('Erro:', error));
-});
-
+document.querySelector('tbody').addEventListener('click', editService);
 document.querySelector('tbody').addEventListener('click', removeService);
 
 fetchServices();

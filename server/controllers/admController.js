@@ -14,6 +14,23 @@ export const getAdms = async (req, res) => {
     }
 };
 
+export const getAdmByCpf = async (req, res) => {
+    const { cpf } = req.params;
+    const q = 'SELECT * FROM adm WHERE cpf = $1';
+
+    try {
+        const data = await db.query(q, [cpf]);
+
+        if (data.length === 0) {
+            return res.status(404).json({ message: 'CPF não encontrado' });
+        }
+
+        return res.status(200).json(data[0]);
+    } catch (err) {
+        return res.status(500).json({ message: 'Erro no servidor', error: err.message });
+    }
+};
+
 export const insertAdm = async (req, res) => {
     const { nome, cpf, senha } = req.body;
 
@@ -25,7 +42,7 @@ export const insertAdm = async (req, res) => {
     // const hashedSenha = await bcrypt.hash(senha, saltRounds);
 
     const q = `
-        INSERT INTO adm (nome, cpf,senha)
+        INSERT INTO adm (nome, cpf, senha)
         VALUES ($1, $2, $3) RETURNING *;
     `;
     const params = [nome, cpf, senha];
@@ -39,6 +56,32 @@ export const insertAdm = async (req, res) => {
         }
         
         return res.status(500).json(err); 
+    }
+};
+
+export const updateAdm = async (req, res) => {
+    const { cpf } = req.params;
+    const { nome, senha } = req.body;
+
+    const q = `
+        UPDATE adm
+        SET nome = $1, senha = $2
+        WHERE cpf = $3 RETURNING *;
+    `;
+    
+    const params = [nome, senha, cpf];
+
+    try {
+        const data = await db.query(q, params);
+
+        if (data.length === 0) {
+            return res.status(404).json({ message: 'Administrador não encontrado.' });
+        }
+
+        return res.status(200).json(data[0]);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json(err);
     }
 };
 
