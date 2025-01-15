@@ -89,28 +89,24 @@ export const updateAtendimento = async (req, res) => {
     }
 };
 
+export const confirmPassword = async (req, res) => {
+    const { senha } = req.body;
 
-// export const updateAtendimento = async (req, res) => {
-//     const { id } = req.params;
-//     const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
+    try {
+        // Valida a senha (supondo que você tenha algum mecanismo de autenticação para validar)
+        const admin = await db.query('SELECT * FROM adm WHERE senha = $1', [senha]);
 
-//     const q = `
-//         UPDATE atendimentos SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6
-//         WHERE id = $7 RETURNING *;
-//     `;
+        console.log(admin);
+        console.log(admin.rows);
+        console.log(admin.rows.length);
 
-//     const values = [nome, sobrenome, telefone, servico, data, atendente, id];
+        if (!admin || !admin.rows || admin.rows.length === 0) {
+            return res.status(400).json({ message: 'Senha incorreta' });
+        }
 
-//     try {
-//         const result = await db.query(q, values);
-
-//         if (result.rowCount === 0) {
-//             return res.status(404).send('Registro não encontrado');
-//         }
-
-//         res.status(200).send('Registro atualizado com sucesso');
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Erro ao atualizar registro');
-//     }
-// };
+        return res.status(200).json({ message: 'Senha correta' });
+    } catch (err) {
+        console.error('Erro ao validar a senha:', err);
+        res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+}

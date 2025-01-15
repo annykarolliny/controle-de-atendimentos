@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAtendimentos, insertAtendimento, deleteAtendimento, updateAtendimento } from '../controllers/user.js';
+import { getAtendimentos, insertAtendimento, deleteAtendimento, updateAtendimento, confirmPassword } from '../controllers/user.js';
 import { getAdms, getAdmByCpf, insertAdm, updateAdm, deleteAdm } from '../controllers/admController.js';
 import { getServices, getServiceById, insertService, updateService, deleteService } from '../controllers/servicesController.js';
 import { getAgricultores, insertAgricultor, deleteAgricultor } from '../controllers/agricultorController.js'
@@ -20,6 +20,7 @@ router.get('/adms', getAdms);
 router.post('/adms', insertAdm);
 router.put('/adms/:cpf', updateAdm);
 router.delete('/adms/:cpf', deleteAdm);
+router.post('/adms/validate-password', confirmPassword);
 
 // Rotas para serviços
 

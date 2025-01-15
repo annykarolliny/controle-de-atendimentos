@@ -1,37 +1,110 @@
-document.querySelector('#submitData').addEventListener('click', function () {
-    const nome = document.querySelector('[name="nome"]').value;
-    const sobrenome = document.querySelector('[name="sobrenome"]').value;
-    const telefone = document.querySelector('[name="telefone"]').value;
-    const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
-    const data = document.querySelector('[name="data-atendimento"]').value;
-    const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
-
-    const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
-
-    fetch('http://localhost:8800/atendimentos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados),
-    })
-        .then(response => {
-            // Verifica se a resposta foi bem-sucedida
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.error); });
-            }
-            return response.json(); // Retorna os dados para o próximo `then`
-        })
-        .then(result => {
-            // Se a resposta foi bem-sucedida, adiciona o novo atendimento
-            alert('Registro adicionado com sucesso!');
-            document.querySelector('#form').reset();
-            addNewAtendimento(result); // Chama somente com dados válidos
-        })
-        .catch(error => {
-            // Trata o erro sem adicionar lines "undefined"
-            alert(`Erro: ${error.message}`);
-            console.error('Erro:', error);
+const validatePassword = async (senha) => {
+    try {
+        const response = await fetch('http://localhost:8800/adms/validate-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senha })
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return { success: false, message: errorData.message || 'Senha incorreta.' };
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro na validação da senha:', error);
+        return { success: false, message: 'Erro na conexão com o servidor.' };
+    }
+};
+
+document.querySelector('#submitData').addEventListener('click', function (e) {
+    e.preventDefault();  // Impede o envio do formulário até a senha ser validada
+
+    // Exibe o modal de confirmação de senha
+    const passwordConfirmModal = new bootstrap.Modal(document.querySelector('#passwordConfirmModal'));
+    passwordConfirmModal.show();
+
+    document.querySelector('#confirmarSenhaBtn').onclick = async function () {
+        const senha = document.querySelector('#atendenteSenha').value.trim();
+
+        // Valida a senha
+        const validationResponse = await validatePassword(senha);
+
+        if (validationResponse.success) {
+            // Se a senha estiver correta, continua o processo de envio do atendimento
+            const nome = document.querySelector('[name="nome"]').value;
+            const sobrenome = document.querySelector('[name="sobrenome"]').value;
+            const telefone = document.querySelector('[name="telefone"]').value;
+            const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
+            const data = document.querySelector('[name="data-atendimento"]').value;
+            const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
+
+            const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
+
+            fetch('http://localhost:8800/atendimentos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error); });
+                    }
+                    return response.json(); 
+                })
+                .then(result => {
+                    alert('Registro adicionado com sucesso!');
+                    document.querySelector('#form').reset();
+                    addNewAtendimento(result); 
+                    passwordConfirmModal.hide(); // Fecha o modal de senha
+                })
+                .catch(error => {
+                    alert(`Erro: ${error.message}`);
+                    console.error('Erro:', error);
+                });
+        } else {
+            // Se a senha estiver incorreta, exibe uma mensagem
+            document.querySelector('#senhaMensagem').classList.remove('d-none');
+        }
+    };
 });
+
+
+// document.querySelector('#submitData').addEventListener('click', function () {
+//     const nome = document.querySelector('[name="nome"]').value;
+//     const sobrenome = document.querySelector('[name="sobrenome"]').value;
+//     const telefone = document.querySelector('[name="telefone"]').value;
+//     const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
+//     const data = document.querySelector('[name="data-atendimento"]').value;
+//     const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
+
+//     const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
+
+//     fetch('http://localhost:8800/atendimentos', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(dados),
+//     })
+//         .then(response => {
+//             // Verifica se a resposta foi bem-sucedida
+//             if (!response.ok) {
+//                 return response.json().then(err => { throw new Error(err.error); });
+//             }
+//             return response.json(); // Retorna os dados para o próximo `then`
+//         })
+//         .then(result => {
+//             // Se a resposta foi bem-sucedida, adiciona o novo atendimento
+//             alert('Registro adicionado com sucesso!');
+//             document.querySelector('#form').reset();
+//             addNewAtendimento(result); // Chama somente com dados válidos
+//         })
+//         .catch(error => {
+//             // Trata o erro sem adicionar lines "undefined"
+//             alert(`Erro: ${error.message}`);
+//             console.error('Erro:', error);
+//         });
+// });
 
 const fetchAtendimentos = () => {
     fetch('http://localhost:8800/atendimentos')

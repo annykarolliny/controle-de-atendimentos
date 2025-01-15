@@ -113,6 +113,62 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal para confirmação de senha -->
+        <div class="modal fade" id="passwordConfirmModal" tabindex="-1" aria-labelledby="passwordConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="passwordConfirmModalLabel">Confirmação de Senha</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="passwordConfirmForm">
+                            <div class="mb-3">
+                                <label for="atendenteSenha" class="form-label">Digite sua senha:</label>
+                                <input type="password" class="form-control" id="atendenteSenha" required>
+                            </div>
+                        </form>
+                        <div id="senhaMensagem" class="text-danger d-none">Senha incorreta. Tente novamente.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="confirmarSenhaBtn" class="btn btn-primary">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+  
+        <!-- <div class="modal fade" id="confirmPasswordModal" tabindex="-1" aria-labelledby="confirmPasswordModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmPasswordModalLabel">Confirme sua senha</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Formulário de confirmação
+                        <form id="confirmForm">
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Informe sua senha:</label>
+                                <input type="text" class="form-control" id="confirmPassword">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCpf" class="form-label">CPF</label>
+                                <input type="text" class="form-control" id="editCpf"> readonly
+                            </div>
+                            <div class="mb-3">
+                                <label for="editSenha" class="form-label">Senha</label>
+                                <input type="text" class="form-control" id="editSenha">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="editAdminButton" style="border-radius: 0; font-size: 14px;">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </main>
 
     <footer>

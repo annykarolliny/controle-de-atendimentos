@@ -61,15 +61,18 @@ export const insertAdm = async (req, res) => {
 
 export const updateAdm = async (req, res) => {
     const { cpf } = req.params;
-    const { nome, senha } = req.body;
+    const { nome, novoCpf } = req.body;
+
+    console.log('CPF original:', cpf);
+    console.log('Dados recebidos:', { nome, novoCpf });
 
     const q = `
         UPDATE adm
-        SET nome = $1, senha = $2
+        SET nome = $1, cpf = $2
         WHERE cpf = $3 RETURNING *;
     `;
     
-    const params = [nome, senha, cpf];
+    const params = [nome, novoCpf, cpf];
 
     try {
         const data = await db.query(q, params);

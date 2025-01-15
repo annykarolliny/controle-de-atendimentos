@@ -7,7 +7,7 @@ class Database {
             host: 'localhost',
             port: 5432,
             user: 'postgres',
-            password: '131203',
+            password: 'pabd',
             database: 'controle-de-atendimentos',
         });
     }
