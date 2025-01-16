@@ -21,7 +21,6 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
     })
     .then(response => {
         if (!response.ok) {
-            // Verifica se a resposta contém erro de CPF duplicado
             return response.json().then(error => {
                 alert(error.message); 
                 throw new Error(error.message);
@@ -99,80 +98,25 @@ const addNovoAdm = (adm) => {
     tableBody.appendChild(newLine);
 };
 
-// const editAdm = (e) => {
-//     e.preventDefault();
-
-//     if (e.target.classList.contains('fa-edit')) {
-//         const line = e.target.closest('tr');
-//         const cpf = line.children[1].textContent.replace(/\D/g, ''); // Remove a formatação do CPF
-
-//         // Preenche o modal com as informações atuais
-//         const nome = line.children[0].textContent;
-//         const senha = line.children[2].textContent;
-//         document.querySelector('#editNome').value = nome;
-//         document.querySelector('#editCpf').value = cpf; 
-//         document.querySelector('#editSenha').value = senha; 
-//         // document.querySelector('#editCpf').value = line.children[1].textContent; // CPF não será editável
-
-//         // Exibe o modal
-//         const editModal = new bootstrap.Modal(document.querySelector('#editAdminModal'));
-//         editModal.show();
-
-//         // Quando o botão "Salvar" for clicado, envia a edição ao backend
-//         document.querySelector('#editAdminButton').onclick = async function () {
-//             const updatedNome = document.querySelector('#editNome').value.trim();
-//             const updatedCpf = document.querySelector('#editCpf').value.trim();
-//             const updatedSenha = document.querySelector('#editSenha').value.trim();
-
-//             try {
-//                 const response = await fetch(`http://localhost:8800/adms/${cpf}`, {
-//                     method: 'PUT',
-//                     headers: { 'Content-Type': 'application/json' },
-//                     body: JSON.stringify({ nome: updatedNome, cpf: updatedCpf, senha: updatedSenha }),
-//                 });
-
-//                 if (response.ok) {
-//                     alert('Administrador atualizado com sucesso!');
-//                     // Atualiza a linha da tabela com os novos dados
-//                     line.children[0].textContent = updatedNome;
-//                     line.children[1].textContent = formatCpf(updatedCpf);
-//                     // line.children[2].textContent = updatedSenha;
-
-//                     editModal.hide();
-//                 } else {
-//                     alert('Erro ao atualizar o administrador.');
-//                 }
-//             } catch (error) {
-//                 console.error('Erro ao editar o administrador:', error);
-//                 alert('Erro na conexão com o servidor.');
-//             }
-//         };
-//     }
-// };
-
 const editAdm = (e) => {
     e.preventDefault();
 
     if (e.target.classList.contains('fa-edit')) {
         const line = e.target.closest('tr');
-        const cpf = line.children[1].textContent.replace(/\D/g, ''); // Remove a formatação do CPF
+        const cpf = line.children[1].textContent.replace(/\D/g, ''); 
 
-        // Preenche o modal com as informações atuais
+        
         const nome = line.children[0].textContent;
-        // const senha = line.children[2].textContent;
+    
         document.querySelector('#editNome').value = nome;
-        document.querySelector('#editCpf').value = line.children[1].textContent; // CPF não será editável
-        // document.querySelector('#editSenha').value = senha;
-
-        // Exibe o modal
+        document.querySelector('#editCpf').value = line.children[1].textContent; 
+ 
         const editModal = new bootstrap.Modal(document.querySelector('#editAdminModal'));
         editModal.show();
 
-        // Quando o botão "Salvar" for clicado, envia a edição ao backend
         document.querySelector('#editAdminButton').onclick = async function () {
             const updatedNome = document.querySelector('#editNome').value.trim();
             const updatedCpf = document.querySelector('#editCpf').value.trim().replace(/\D/g, '');
-            // const updatedSenha = document.querySelector('#editSenha').value.trim();
 
             try {
                 const response = await fetch(`http://localhost:8800/adms/${cpf}`, {
@@ -183,10 +127,9 @@ const editAdm = (e) => {
 
                 if (response.ok) {
                     alert('Administrador atualizado com sucesso!');
-                    // Atualiza a linha da tabela com os novos dados
+        
                     line.children[0].textContent = updatedNome;
                     line.children[1].textContent = formatCpf(updatedCpf);
-                    // line.children[2].textContent = updatedSenha;
 
                     editModal.hide();
                 } else {
@@ -239,7 +182,7 @@ const closeModal = () => {
 modalElement.addEventListener('hidden.bs.modal', function () {
     const backdrop = document.querySelector('.modal-backdrop');
     if (backdrop) {
-        backdrop.remove(); // Remove o backdrop se ele existir
+        backdrop.remove();
     }
 });
 

@@ -1,9 +1,9 @@
-const validatePassword = async (senha) => {
+const validatePassword = async (cpf, senha) => {
     try {
         const response = await fetch('http://localhost:8800/adms/validate-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ senha })
+            body: JSON.stringify({ cpf, senha })
         });
 
         if (!response.ok) {
@@ -19,26 +19,30 @@ const validatePassword = async (senha) => {
 };
 
 document.querySelector('#submitData').addEventListener('click', function (e) {
-    e.preventDefault();  // Impede o envio do formulário até a senha ser validada
+    e.preventDefault(); 
 
-    // Exibe o modal de confirmação de senha
     const passwordConfirmModal = new bootstrap.Modal(document.querySelector('#passwordConfirmModal'));
+    document.querySelector("#cpfAtendente").value = document.querySelector('[name="atendente"] option:checked').value;
+    const nome = document.querySelector('[name="nome"]').value;
+    const sobrenome = document.querySelector('[name="sobrenome"]').value;
+    const telefone = document.querySelector('[name="telefone"]').value;
+    const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
+    const data = document.querySelector('[name="data-atendimento"]').value;
+    const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
     passwordConfirmModal.show();
 
     document.querySelector('#confirmarSenhaBtn').onclick = async function () {
         const senha = document.querySelector('#atendenteSenha').value.trim();
 
-        // Valida a senha
-        const validationResponse = await validatePassword(senha);
+        const validationResponse = await validatePassword(document.querySelector("#cpfAtendente").value, senha);
 
         if (validationResponse.success) {
-            // Se a senha estiver correta, continua o processo de envio do atendimento
-            const nome = document.querySelector('[name="nome"]').value;
-            const sobrenome = document.querySelector('[name="sobrenome"]').value;
-            const telefone = document.querySelector('[name="telefone"]').value;
-            const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
-            const data = document.querySelector('[name="data-atendimento"]').value;
-            const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
+            // const nome = document.querySelector('[name="nome"]').value;
+            // const sobrenome = document.querySelector('[name="sobrenome"]').value;
+            // const telefone = document.querySelector('[name="telefone"]').value;
+            // const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
+            // const data = document.querySelector('[name="data-atendimento"]').value;
+            // const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
 
             const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
 
@@ -57,54 +61,17 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
                     alert('Registro adicionado com sucesso!');
                     document.querySelector('#form').reset();
                     addNewAtendimento(result); 
-                    passwordConfirmModal.hide(); // Fecha o modal de senha
+                    passwordConfirmModal.hide();
                 })
                 .catch(error => {
                     alert(`Erro: ${error.message}`);
                     console.error('Erro:', error);
                 });
         } else {
-            // Se a senha estiver incorreta, exibe uma mensagem
             document.querySelector('#senhaMensagem').classList.remove('d-none');
         }
     };
 });
-
-
-// document.querySelector('#submitData').addEventListener('click', function () {
-//     const nome = document.querySelector('[name="nome"]').value;
-//     const sobrenome = document.querySelector('[name="sobrenome"]').value;
-//     const telefone = document.querySelector('[name="telefone"]').value;
-//     const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
-//     const data = document.querySelector('[name="data-atendimento"]').value;
-//     const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
-
-//     const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
-
-//     fetch('http://localhost:8800/atendimentos', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(dados),
-//     })
-//         .then(response => {
-//             // Verifica se a resposta foi bem-sucedida
-//             if (!response.ok) {
-//                 return response.json().then(err => { throw new Error(err.error); });
-//             }
-//             return response.json(); // Retorna os dados para o próximo `then`
-//         })
-//         .then(result => {
-//             // Se a resposta foi bem-sucedida, adiciona o novo atendimento
-//             alert('Registro adicionado com sucesso!');
-//             document.querySelector('#form').reset();
-//             addNewAtendimento(result); // Chama somente com dados válidos
-//         })
-//         .catch(error => {
-//             // Trata o erro sem adicionar lines "undefined"
-//             alert(`Erro: ${error.message}`);
-//             console.error('Erro:', error);
-//         });
-// });
 
 const fetchAtendimentos = () => {
     fetch('http://localhost:8800/atendimentos')
@@ -161,32 +128,12 @@ const displayAtendimentos = (atendimentos) => {
     });
 };
 
-const atendimentoAlreadyExisting = (atendimento) => {
-    const lines = document.querySelectorAll('tbody tr');
-    return Array.from(lines).some((line) => {
-        const cells = line.children;
-        return (
-            cells[1].textContent === atendimento.nome &&
-            cells[2].textContent === atendimento.sobrenome &&
-            cells[3].textContent === atendimento.telefone &&
-            cells[4].textContent === atendimento.servico &&
-            cells[5].textContent === formatDate(atendimento.data) &&
-            cells[6].textContent === atendimento.atendente
-        );
-    });
-};
-
 const addNewAtendimento = (atendimento) => {
     const tableBody = document.querySelector('tbody');   
     const formattedDate = formatDate(atendimento.data);
     const formattedTelefone = formatTel(atendimento.telefone);
-
-    if (atendimentoAlreadyExisting(atendimento)) {
-        alert('Esse atendimento já está cadastrado!');
-        return;
-    }
-
     const newLine = document.createElement('tr');
+
     newLine.setAttribute("data-id", atendimento.id);
 
     newLine.innerHTML = `
@@ -203,7 +150,6 @@ const addNewAtendimento = (atendimento) => {
         </td>
     `;
     tableBody.appendChild(newLine);
-    // alert('Registro adicionado com sucesso!');
 };
 
 const removerAtendimento = async (e) => {
@@ -274,7 +220,6 @@ const loadServices = async () => {
 
         services.forEach(service => {
             const option = document.createElement('option');
-            // option.value = service.servico;
             option.value = service.id;
             option.textContent = service.servico;
             selectServices.appendChild(option);
@@ -285,85 +230,81 @@ const loadServices = async () => {
     }
 }
 
-const editarAtendimento = async (e) => {
-    e.preventDefault();
 
-    if (e.target.classList.contains('fa-edit')) {
-        const line = e.target.closest('tr');
-        const id = line.dataset.id;
 
-        // Coleta os dados atuais do atendimento
-        const nome = line.children[1].textContent;
-        const sobrenome = line.children[2].textContent;
-        const telefone = line.children[3].textContent;
-        const servico = line.children[4].textContent;
-        const dataAtual = line.children[5].textContent.split('/').reverse().join('-'); // Formata para ISO
-        const atendente = line.children[6].textContent;
+// const editarAtendimento = async (e) => {
+//     e.preventDefault();
 
-        // Preenche o formulário do modal com os dados existentes
-        document.querySelector('[name="nome"]').value = nome;
-        document.querySelector('[name="sobrenome"]').value = sobrenome;
-        document.querySelector('[name="telefone"]').value = telefone;
-        document.querySelector('[name="servico"]').value = servico;
-        document.querySelector('[name="data-atendimento"]').value = dataAtual;
-        document.querySelector('[name="atendente"]').value = atendente;
+//     if (e.target.classList.contains('fa-edit')) {
+//         const line = e.target.closest('tr');
+//         const id = line.dataset.id;
 
-        // Exibe o modal
-        const modal = new bootstrap.Modal(document.querySelector('#addRecordModal'));
-        modal.show();
+//         const nome = line.children[1].textContent;
+//         const sobrenome = line.children[2].textContent;
+//         const telefone = line.children[3].textContent;
+//         const servico = line.children[4].textContent;
+//         const dataAtual = line.children[5].textContent.split('/').reverse().join('-'); 
+//         const atendente = line.children[6].textContent;
 
-        const botaoSalvar = document.querySelector('#submitData');
-        botaoSalvar.textContent = 'Salvar';
+//         document.querySelector('[name="nome"]').value = nome;
+//         document.querySelector('[name="sobrenome"]').value = sobrenome;
+//         document.querySelector('[name="telefone"]').value = telefone;
+//         document.querySelector('[name="servico"]').value = servico;
+//         document.querySelector('[name="data-atendimento"]').value = dataAtual;
+//         document.querySelector('[name="atendente"]').value = atendente;
 
-        botaoSalvar.onclick = async function () {
-            const dadosAtualizados = {
-                nome: document.querySelector('[name="nome"]').value,
-                sobrenome: document.querySelector('[name="sobrenome"]').value,
-                telefone: document.querySelector('[name="telefone"]').value,
-                servico: document.querySelector('[name="servico"]').value,
-                data: document.querySelector('[name="data-atendimento"]').value,
-                atendente: document.querySelector('[name="atendente"]').value,
-            };
+//         const modal = new bootstrap.Modal(document.querySelector('#addRecordModal'));
+//         modal.show();
 
-            try {
-                const response = await fetch(`http://localhost:8800/atendimentos/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(dadosAtualizados),
-                });
+//         const botaoSalvar = document.querySelector('#submitData');
+//         botaoSalvar.textContent = 'Salvar';
 
-                if (response.ok) {
-                    alert('Registro atualizado com sucesso!');
+//         botaoSalvar.onclick = async function () {
+//             const dadosAtualizados = {
+//                 nome: document.querySelector('[name="nome"]').value,
+//                 sobrenome: document.querySelector('[name="sobrenome"]').value,
+//                 telefone: document.querySelector('[name="telefone"]').value,
+//                 servico: document.querySelector('[name="servico"]').value,
+//                 data: document.querySelector('[name="data-atendimento"]').value,
+//                 atendente: document.querySelector('[name="atendente"]').value,
+//             };
 
-                    // Atualiza a line na tabela
-                    line.children[1].textContent = dadosAtualizados.nome;
-                    line.children[2].textContent = dadosAtualizados.sobrenome;
-                    line.children[3].textContent = dadosAtualizados.telefone;
-                    line.children[4].textContent = dadosAtualizados.servico;
-                    line.children[5].textContent = formatDate(dadosAtualizados.data);
-                    line.children[6].textContent = dadosAtualizados.atendente;
+//             try {
+//                 const response = await fetch(`http://localhost:8800/atendimentos/${id}`, {
+//                     method: 'PUT',
+//                     headers: {
+//                         'Content-Type': 'application/json',
+//                     },
+//                     body: JSON.stringify(dadosAtualizados),
+//                 });
 
-                    // Fecha o modal
-                    modal.hide();
+//                 if (response.ok) {
+//                     alert('Registro atualizado com sucesso!');
 
-                    botaoSalvar.textContent = 'Cadastrar Atendimento';
-                } else {
-                    alert('Erro ao atualizar o registro.');
-                }
-            } catch (error) {
-                console.error('Erro ao atualizar registro:', error);
-                alert('Erro na conexão com o servidor.');
-            }
-        };
-    }
-};
+//                     line.children[1].textContent = dadosAtualizados.nome;
+//                     line.children[2].textContent = dadosAtualizados.sobrenome;
+//                     line.children[3].textContent = dadosAtualizados.telefone;
+//                     line.children[4].textContent = dadosAtualizados.servico;
+//                     line.children[5].textContent = formatDate(dadosAtualizados.data);
+//                     line.children[6].textContent = dadosAtualizados.atendente;
+
+//                     modal.hide();
+
+//                     botaoSalvar.textContent = 'Cadastrar Atendimento';
+//                 } else {
+//                     alert('Erro ao atualizar o registro.');
+//                 }
+//             } catch (error) {
+//                 console.error('Erro ao atualizar registro:', error);
+//                 alert('Erro na conexão com o servidor.');
+//             }
+//         };
+//     }
+// };
 
 document.querySelector('tbody').addEventListener('click', removerAtendimento);
-document.querySelector('tbody').addEventListener('click', editarAtendimento);
+// document.querySelector('tbody').addEventListener('click', editarAtendimento);
 
-// Inicializa os dados
 fetchAtendimentos();
 loadAtendentes();
 loadServices();

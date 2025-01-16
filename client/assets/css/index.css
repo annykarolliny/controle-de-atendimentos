@@ -9,6 +9,7 @@
 .btn {
     background-color: #25C32B; 
     color: #fff; 
+    border: 1px solid #fff;
     border-radius: 0; 
     margin-right: 10px; 
     padding: 5px 20px; 
