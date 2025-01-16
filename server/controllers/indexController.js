@@ -20,12 +20,11 @@ export const insertAtendimento = async (req, res) => {
         SELECT * FROM atendimentos 
         WHERE nome = $1 AND sobrenome = $2 AND telefone = $3 AND servico = $4 AND data = $5 AND atendente = $6;
     `;
-    const paramsCheck = [nome, sobrenome, telefone, servico, data, atendente];
+    const paramsCheck = [nome, sobrenome, telefone, servico, new Date(data), atendente];
 
     try {
         const existingAtendimento = await db.query(queryCheck, paramsCheck);
 
-        // Se já existe, retorna erro
         if (existingAtendimento.length > 0) {
             return res.status(400).json({
                 error: 'Atendimento já existe para essa data!',
@@ -64,45 +63,42 @@ export const deleteAtendimento = async (req, res) => {
     }
 };
 
-export const updateAtendimento = async (req, res) => {
-    const { id } = req.params;
-    const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
+// export const updateAtendimento = async (req, res) => {
+//     const { id } = req.params;
+//     const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
 
-    const q = `
-        UPDATE atendimentos 
-        SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6 RETURNING *;
-    `;
-    const values = [nome, sobrenome, telefone, servico, data, atendente, id];
+//     const q = `
+//         UPDATE atendimentos 
+//         SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6 RETURNING *;
+//     `;
+//     const values = [nome, sobrenome, telefone, servico, data, atendente, id];
 
-    try {
-        const result = await db.query(q, values);
+//     try {
+//         const result = await db.query(q, values);
 
-        if (result.rowCount === 0) {
-            return res.status(404).send('Registro não encontrado');
-        }
+//         if (result.rowCount === 0) {
+//             return res.status(404).send('Registro não encontrado');
+//         }
 
-        // Retorna o atendimento atualizado para o frontend
-        res.status(200).json(result.rows[0]);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao atualizar registro');
-    }
-};
+//         res.status(200).json(result.rows[0]);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send('Erro ao atualizar registro');
+//     }
+// };
 
 export const confirmPassword = async (req, res) => {
-    const { senha } = req.body;
+    const { cpf, senha } = req.body;
 
     try {
-        // Valida a senha (supondo que você tenha algum mecanismo de autenticação para validar)
-        const admin = await db.query('SELECT * FROM adm WHERE senha = $1', [senha]);
+        const admin = await db.query('SELECT senha FROM adm WHERE cpf = $1', [cpf]);
 
-        console.log(admin);
-        console.log(admin.rows);
-        console.log(admin.rows.length);
-
-        if (!admin || !admin.rows || admin.rows.length === 0) {
+        if (!admin ) {
             return res.status(400).json({ message: 'Senha incorreta' });
         }
+
+        if(senha != admin[0].senha)
+            return res.status(400).json({ message: 'Senha incorreta' });
 
         return res.status(200).json({ message: 'Senha correta' });
     } catch (err) {

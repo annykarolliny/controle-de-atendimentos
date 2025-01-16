@@ -33,7 +33,6 @@ export const getServiceById = async (req, res) => {
 export const insertService = async (req, res) => {
     const { servico } = req.body;
 
-    // Validação: o campo 'servico' é obrigatório
     if (!servico || servico.trim() === '') {
         return res.status(400).json({ message: 'O nome do serviço é obrigatório.' });
     }
