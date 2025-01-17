@@ -30,6 +30,35 @@ export const insertAgricultor = async (req, res) => {
     }
 };
 
+export const updateAgricultor = async (req, res) => {
+    const { telefone } = req.params;
+    const { nome, sobrenome, novoTelefone } = req.body;
+
+    if (!nome || !sobrenome || !novoTelefone) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+    }
+
+    const q = `
+        UPDATE agricultores
+        SET nome = $1, sobrenome = $2, telefone = $3
+        WHERE telefone = $4 RETURNING *;
+    `;
+    const params = [nome, sobrenome, novoTelefone, telefone];
+
+    try {
+        const data = await db.query(q, params);
+
+        if (data.rowCount === 0) {
+            return res.status(404).json({ message: 'Agricultor não encontrado.' });
+        }
+
+        return res.status(200).json(data.rows[0]);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Erro ao atualizar agricultor', error: err.message });
+    }
+};
+
 export const deleteAgricultor = async (req, res) => {
     const { telefone } = req.params;
 
@@ -48,3 +77,4 @@ export const deleteAgricultor = async (req, res) => {
         res.status(500).send('Erro ao excluir agricultor');
     }
 };
+

@@ -1,5 +1,4 @@
 import Database from '../db.js';
-// import bcrypt from 'bcrypt';
 
 const db = new Database();
 
@@ -37,9 +36,6 @@ export const insertAdm = async (req, res) => {
     if (!nome || !cpf || !senha) {
         return res.status(400).json({ message: 'Todos os dados são obrigatórios.' });
     }
-
-    // const saltRounds = 10; // Define o custo do hash
-    // const hashedSenha = await bcrypt.hash(senha, saltRounds);
 
     const q = `
         INSERT INTO adm (nome, cpf, senha)

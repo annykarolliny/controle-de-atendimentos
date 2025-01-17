@@ -1,23 +1,3 @@
-const validatePassword = async (cpf, senha) => {
-    try {
-        const response = await fetch('http://localhost:8800/adms/validate-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cpf, senha })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            return { success: false, message: errorData.message || 'Senha incorreta.' };
-        }
-
-        return { success: true };
-    } catch (error) {
-        console.error('Erro na validação da senha:', error);
-        return { success: false, message: 'Erro na conexão com o servidor.' };
-    }
-};
-
 document.querySelector('#submitData').addEventListener('click', function (e) {
     e.preventDefault(); 
 
@@ -37,13 +17,6 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
         const validationResponse = await validatePassword(document.querySelector("#cpfAtendente").value, senha);
 
         if (validationResponse.success) {
-            // const nome = document.querySelector('[name="nome"]').value;
-            // const sobrenome = document.querySelector('[name="sobrenome"]').value;
-            // const telefone = document.querySelector('[name="telefone"]').value;
-            // const servicoText = document.querySelector('[name="servico"] option:checked').textContent;
-            // const data = document.querySelector('[name="data-atendimento"]').value;
-            // const atendenteText = document.querySelector('[name="atendente"] option:checked').textContent;
-
             const dados = { nome, sobrenome, telefone, servico: servicoText, data, atendente: atendenteText };
 
             fetch('http://localhost:8800/atendimentos', {
@@ -72,6 +45,26 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
         }
     };
 });
+
+const validatePassword = async (cpf, senha) => {
+    try {
+        const response = await fetch('http://localhost:8800/adms/validate-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cpf, senha })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return { success: false, message: errorData.message || 'Senha incorreta.' };
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error('Erro na validação da senha:', error);
+        return { success: false, message: 'Erro na conexão com o servidor.' };
+    }
+};
 
 const fetchAtendimentos = () => {
     fetch('http://localhost:8800/atendimentos')
@@ -152,6 +145,114 @@ const addNewAtendimento = (atendimento) => {
     tableBody.appendChild(newLine);
 };
 
+document.querySelector('tbody').addEventListener('click', async function (e) {
+    if (e.target.classList.contains('fa-edit')) {
+        const line = e.target.closest('tr');
+        const id = line.dataset.id;
+
+        try {
+            const response = await fetch(`http://localhost:8800/atendimentos/${id}`);
+            const atendimento = await response.json();
+
+            if (response.ok) {
+                const selectAtendente = document.querySelector('[name="updateAtendente"]');
+                selectAtendente.innerHTML = ''; 
+                const atendentesResponse = await fetch('http://localhost:8800/adms');
+                const atendentes = await atendentesResponse.json();
+                atendentes.forEach(atendente => {
+                    const option = document.createElement('option');
+                    option.value = atendente.cpf;
+                    option.textContent = atendente.nome;
+                    if (atendente.cpf === atendimento.atendente) {
+                        option.selected = true;
+                    }
+                    selectAtendente.appendChild(option);
+                });
+
+                const selectServico = document.querySelector('[name="updateServico"]');
+                selectServico.innerHTML = ''; 
+                const servicesResponse = await fetch('http://localhost:8800/services');
+                const services = await servicesResponse.json();
+                services.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.id;
+                    option.textContent = service.servico;
+                    if (service.id === atendimento.servico) {
+                        option.selected = true;
+                    }
+                    selectServico.appendChild(option);
+                });
+
+                document.querySelector('[name="updateNome"]').value = atendimento.nome;
+                document.querySelector('[name="updateSobrenome"]').value = atendimento.sobrenome;
+                document.querySelector('[name="updateTelefone"]').value = atendimento.telefone;
+                document.querySelector('[name="updateDataAtendimento"]').value = atendimento.data.split('T')[0];
+
+                const updateModal = new bootstrap.Modal(document.querySelector('#updateRecordModal'));
+                updateModal.show();
+
+                document.querySelector('#updateDataBtn').dataset.id = id;
+            } else {
+                alert('Erro ao carregar dados para edição.');
+            }
+        } catch (error) {
+            console.error('Erro ao buscar atendimento:', error);
+        }
+    }
+});
+
+document.querySelector('#updateDataBtn').addEventListener('click', async function () {
+    const id = this.dataset.id; 
+    const nome = document.querySelector('[name="updateNome"]').value.trim();
+    const sobrenome = document.querySelector('[name="updateSobrenome"]').value.trim();
+    const telefone = document.querySelector('[name="updateTelefone"]').value.trim();
+    const data = document.querySelector('[name="updateDataAtendimento"]').value;
+
+    const atendente = document.querySelector('[name="updateAtendente"] option:checked').textContent.trim();
+    const servico = document.querySelector('[name="updateServico"] option:checked').textContent.trim();
+
+    const dadosAtualizados = { nome, sobrenome, telefone, data, atendente, servico };
+
+    try {
+        const response = await fetch(`http://localhost:8800/atendimentos/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosAtualizados),
+        });
+
+        if (response.ok) {
+            await atualizarAgricultor(nome, sobrenome, telefone);
+
+            alert('Registro atualizado com sucesso!');
+            location.reload(); 
+        } else {
+            alert('Erro ao atualizar o registro.');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar o registro:', error);
+    }
+});
+
+const atualizarAgricultor = async (nome, sobrenome, telefone) => {
+    const dados = { nome, sobrenome, telefone };
+
+    try {
+        const response = await fetch(`http://localhost:8800/agricultores/${telefone}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados),
+        });
+
+        if (response.ok) {
+            console.log('Agricultor atualizado com sucesso!');
+        } else {
+            console.error('Erro ao atualizar agricultor:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Erro na conexão com o servidor:', error);
+    }
+};
+
 const removerAtendimento = async (e) => {
     e.preventDefault();
     
@@ -195,7 +296,6 @@ const loadAtendentes = async () => {
 
         atendentes.forEach(atendente => {
             const option = document.createElement('option');
-            // option.value = atendente.nome;
             option.value = atendente.cpf;
             option.textContent = atendente.nome;
             selectAtendente.appendChild(option);
@@ -230,80 +330,7 @@ const loadServices = async () => {
     }
 }
 
-
-
-// const editarAtendimento = async (e) => {
-//     e.preventDefault();
-
-//     if (e.target.classList.contains('fa-edit')) {
-//         const line = e.target.closest('tr');
-//         const id = line.dataset.id;
-
-//         const nome = line.children[1].textContent;
-//         const sobrenome = line.children[2].textContent;
-//         const telefone = line.children[3].textContent;
-//         const servico = line.children[4].textContent;
-//         const dataAtual = line.children[5].textContent.split('/').reverse().join('-'); 
-//         const atendente = line.children[6].textContent;
-
-//         document.querySelector('[name="nome"]').value = nome;
-//         document.querySelector('[name="sobrenome"]').value = sobrenome;
-//         document.querySelector('[name="telefone"]').value = telefone;
-//         document.querySelector('[name="servico"]').value = servico;
-//         document.querySelector('[name="data-atendimento"]').value = dataAtual;
-//         document.querySelector('[name="atendente"]').value = atendente;
-
-//         const modal = new bootstrap.Modal(document.querySelector('#addRecordModal'));
-//         modal.show();
-
-//         const botaoSalvar = document.querySelector('#submitData');
-//         botaoSalvar.textContent = 'Salvar';
-
-//         botaoSalvar.onclick = async function () {
-//             const dadosAtualizados = {
-//                 nome: document.querySelector('[name="nome"]').value,
-//                 sobrenome: document.querySelector('[name="sobrenome"]').value,
-//                 telefone: document.querySelector('[name="telefone"]').value,
-//                 servico: document.querySelector('[name="servico"]').value,
-//                 data: document.querySelector('[name="data-atendimento"]').value,
-//                 atendente: document.querySelector('[name="atendente"]').value,
-//             };
-
-//             try {
-//                 const response = await fetch(`http://localhost:8800/atendimentos/${id}`, {
-//                     method: 'PUT',
-//                     headers: {
-//                         'Content-Type': 'application/json',
-//                     },
-//                     body: JSON.stringify(dadosAtualizados),
-//                 });
-
-//                 if (response.ok) {
-//                     alert('Registro atualizado com sucesso!');
-
-//                     line.children[1].textContent = dadosAtualizados.nome;
-//                     line.children[2].textContent = dadosAtualizados.sobrenome;
-//                     line.children[3].textContent = dadosAtualizados.telefone;
-//                     line.children[4].textContent = dadosAtualizados.servico;
-//                     line.children[5].textContent = formatDate(dadosAtualizados.data);
-//                     line.children[6].textContent = dadosAtualizados.atendente;
-
-//                     modal.hide();
-
-//                     botaoSalvar.textContent = 'Cadastrar Atendimento';
-//                 } else {
-//                     alert('Erro ao atualizar o registro.');
-//                 }
-//             } catch (error) {
-//                 console.error('Erro ao atualizar registro:', error);
-//                 alert('Erro na conexão com o servidor.');
-//             }
-//         };
-//     }
-// };
-
 document.querySelector('tbody').addEventListener('click', removerAtendimento);
-// document.querySelector('tbody').addEventListener('click', editarAtendimento);
 
 fetchAtendimentos();
 loadAtendentes();

@@ -45,9 +45,9 @@ export const insertService = async (req, res) => {
 
     try {
         const data = await db.query(q, params);
-        return res.status(201).json(data[0]); // Retorna o serviço criado
+        return res.status(201).json(data[0]); 
     } catch (err) {
-        if (err.code === '23505') { // Código de erro para chave única no Postgres
+        if (err.code === '23505') { 
             return res.status(400).json({ message: 'O serviço já está cadastrado.' });
         }
         return res.status(500).json({ message: 'Erro no servidor.', error: err.message });
@@ -56,7 +56,7 @@ export const insertService = async (req, res) => {
 
 export const updateService = async (req, res) => {
     const { id } = req.params;
-    const { servico } = req.body;  // Valor para atualização
+    const { servico } = req.body; 
 
     if (!servico || servico.trim() === '') {
         return res.status(400).json({ message: 'O nome do serviço é obrigatório.' });
@@ -71,9 +71,9 @@ export const updateService = async (req, res) => {
             return res.status(404).json({ message: 'Serviço não encontrado' });
         }
 
-        return res.status(200).json(data[0]);  // Retorna o serviço atualizado
+        return res.status(200).json(data[0]); 
     } catch (err) {
-        console.error('Erro ao atualizar serviço:', err);  // Exibe erro no servidor
+        console.error('Erro ao atualizar serviço:', err);  
         return res.status(500).json({ message: 'Erro ao atualizar o serviço', error: err.message });
     }
 };

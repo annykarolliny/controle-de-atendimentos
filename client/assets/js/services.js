@@ -19,7 +19,6 @@ document.querySelector('#submitData').addEventListener('click', function (e) {
     })
     .then(response => {
         if (!response.ok) {
-            // Verifica se a resposta contém erro de serviço duplicado
             return response.json().then(error => {
                 alert(error.message); 
                 throw new Error(error.message);
@@ -80,35 +79,6 @@ const addNewService = (service) => {
     tableBody.appendChild(newLine);
 };
 
-const removeService = async (e) => {
-    e.preventDefault();
-    
-    if (e.target.classList.contains('fa-trash')) {
-        const line = e.target.closest('tr');
-        const id = line.dataset.id;
-
-        if (confirm('Tem certeza que deseja excluir este serviço?')) {
-            try {
-                const response = await fetch(`http://localhost:8800/services/${id}`, {
-                    method: 'DELETE',
-                });
-
-                if (response.ok) {
-                    alert('Serviço excluído com sucesso!');
-                    line.remove();
-                } else if (response.status === 404) {
-                    alert('Serviço não encontrado.');
-                } else {
-                    alert('Erro ao excluir o serviço.');
-                }
-            } catch (error) {
-                console.error('Erro ao excluir serviço:', error);
-                alert('Erro na conexão com o servidor.');
-            }
-        }
-    }
-};
-
 const editService = (e) => {
     e.preventDefault();
 
@@ -117,14 +87,11 @@ const editService = (e) => {
         const id = line.dataset.id;
         const currentService = line.children[1].textContent;
 
-        // Preenche o campo do modal com o serviço atual
         document.querySelector('#editServiceInput').value = currentService;
         
-        // Exibe o modal
         const editModal = new bootstrap.Modal(document.querySelector('#editServiceModal'));
         editModal.show();
 
-        // Quando o botão "Salvar" for clicado, envia a edição ao backend
         document.querySelector('#editServiceBtn').onclick = async function () {
             const updatedService = document.querySelector('#editServiceInput').value.trim();
 
@@ -153,6 +120,35 @@ const editService = (e) => {
                 alert('Erro na conexão com o servidor.');
             }
         };
+    }
+};
+
+const removeService = async (e) => {
+    e.preventDefault();
+    
+    if (e.target.classList.contains('fa-trash')) {
+        const line = e.target.closest('tr');
+        const id = line.dataset.id;
+
+        if (confirm('Tem certeza que deseja excluir este serviço?')) {
+            try {
+                const response = await fetch(`http://localhost:8800/services/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    alert('Serviço excluído com sucesso!');
+                    line.remove();
+                } else if (response.status === 404) {
+                    alert('Serviço não encontrado.');
+                } else {
+                    alert('Erro ao excluir o serviço.');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir serviço:', error);
+                alert('Erro na conexão com o servidor.');
+            }
+        }
     }
 };
 

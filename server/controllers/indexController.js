@@ -13,6 +13,23 @@ export const getAtendimentos = async (req, res) => {
     }
 };
 
+export const getAtendimentoById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const atendimento = await db.query('SELECT * FROM atendimentos WHERE id = $1', [id]);
+
+        if (atendimento.length === 0) {
+            return res.status(404).json({ message: 'Atendimento não encontrado.' });
+        }
+
+        res.status(200).json(atendimento[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao buscar atendimento.' });
+    }
+};
+
 export const insertAtendimento = async (req, res) => {
     const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
 
@@ -44,6 +61,32 @@ export const insertAtendimento = async (req, res) => {
     }
 };
 
+export const updateAtendimento = async (req, res) => {
+    const { id } = req.params;
+    const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
+
+    const q = `
+        UPDATE atendimentos
+        SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6
+        WHERE id = $7
+        RETURNING *;
+    `;
+    const params = [nome, sobrenome, telefone, servico, data, atendente, id];
+
+    try {
+        const updatedAtendimento = await db.query(q, params);
+
+        if (updatedAtendimento.length === 0) {
+            return res.status(404).json({ message: 'Atendimento não encontrado.' });
+        }
+
+        res.status(200).json(updatedAtendimento[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao atualizar atendimento.' });
+    }
+};
+
 export const deleteAtendimento = async (req, res) => {
     const { id } = req.params;
 
@@ -62,30 +105,6 @@ export const deleteAtendimento = async (req, res) => {
         res.status(500).send('Erro ao excluir atendimento');
     }
 };
-
-// export const updateAtendimento = async (req, res) => {
-//     const { id } = req.params;
-//     const { nome, sobrenome, telefone, servico, data, atendente } = req.body;
-
-//     const q = `
-//         UPDATE atendimentos 
-//         SET nome = $1, sobrenome = $2, telefone = $3, servico = $4, data = $5, atendente = $6 RETURNING *;
-//     `;
-//     const values = [nome, sobrenome, telefone, servico, data, atendente, id];
-
-//     try {
-//         const result = await db.query(q, values);
-
-//         if (result.rowCount === 0) {
-//             return res.status(404).send('Registro não encontrado');
-//         }
-
-//         res.status(200).json(result.rows[0]);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send('Erro ao atualizar registro');
-//     }
-// };
 
 export const confirmPassword = async (req, res) => {
     const { cpf, senha } = req.body;
